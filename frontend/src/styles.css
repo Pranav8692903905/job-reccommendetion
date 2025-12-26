@@ -1,0 +1,17 @@
+:root{color-scheme:light dark}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Arial,Helvetica,sans-serif;background:#0b0b0b;color:#f3f3f3}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.header{display:flex;align-items:center;gap:12px}
+.card{background:#111;border:1px solid #222;border-radius:12px;padding:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.section-title{margin:8px 0 12px;font-size:20px}
+.button{background:#4f46e5;border:none;color:white;padding:10px 14px;border-radius:8px;cursor:pointer}
+.button:disabled{opacity:.6;cursor:not-allowed}
+.helper{color:#bdbdbd;font-size:13px}
+.list{display:flex;flex-direction:column;gap:10px}
+.job{padding:10px;border-radius:8px;border:1px solid #222}
+.job h4{margin:0 0 4px}
+.job a{color:#8ab4f8}
+.spinner{opacity:.9}
+input[type="file"]{display:block}
