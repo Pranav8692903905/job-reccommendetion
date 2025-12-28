@@ -1,6 +1,6 @@
 import streamlit as st
-from src.helper import extract_text_from_pdf, ask_openai
-from src.job_api import fetch_linkedin_jobs, fetch_naukri_jobs
+from src.helper import extract_text_from_pdf, extract_keywords, analyze_resume
+from src.job_api import fetch_rss_jobs
 
 st.set_page_config(page_title="Job Recommender", layout="wide")
 st.title("📄AI Job Recommender")
@@ -12,16 +12,8 @@ if uploaded_file:
     with st.spinner("Extracting text from your resume..."):
         resume_text = extract_text_from_pdf(uploaded_file)
 
-    with st.spinner("Summarizing your resume..."):
-        summary = ask_openai(f"Summarize this resume highlighting the skills, edcucation, and experience: \n\n{resume_text}", max_tokens=500)
-
-    
-    with st.spinner("Finding skill Gaps..."):
-        gaps = ask_openai(f"Analyze this resume and highlight missing skills, certifications, and experiences needed for better job opportunities: \n\n{resume_text}", max_tokens=400)
-
-
-    with st.spinner("Creating Future Roadmap..."):
-        roadmap = ask_openai(f"Based on this resume, suggest a future roadmap to improve this person's career prospects (Skill to learn, certification needed, industry exposure): \n\n{resume_text}", max_tokens=400)
+    with st.spinner("Analyzing your resume..."):
+        summary, gaps, roadmap = analyze_resume(resume_text)
     
     # Display nicely formatted results
     st.markdown("---")
@@ -41,42 +33,27 @@ if uploaded_file:
 
     if st.button("🔎Get Job Recommendations"):
         with st.spinner("Fetching job recommendations..."):
-            keywords = ask_openai(
-                f"Based on this resume summary, suggest the best job titles and keywords for searching jobs. Give a comma-separated list only, no explanation.\n\nSummary: {summary}",
-                max_tokens=100
-            )
+            keywords, _ = extract_keywords(summary, limit=12)
 
             search_keywords_clean = keywords.replace("\n", "").strip()
 
         st.success(f"Extracted Job Keywords: {search_keywords_clean}")
 
-        with st.spinner("Fetching jobs from LinkedIn and Naukri..."):
-            linkedin_jobs = fetch_linkedin_jobs(search_keywords_clean, rows=60)
-            naukri_jobs = fetch_naukri_jobs(search_keywords_clean, rows=60)
+        with st.spinner("Fetching jobs from RSS feeds..."):
+            rss_jobs = fetch_rss_jobs(search_keywords_clean, rows=60)
 
 
         st.markdown("---")
-        st.header("💼 Top LinkedIn Jobs")
+        st.header("💼 Jobs from RSS feeds")
 
-        if linkedin_jobs:
-            for job in linkedin_jobs:
-                st.markdown(f"**{job.get('title')}** at *{job.get('companyName')}*")
-                st.markdown(f"- 📍 {job.get('location')}")
-                st.markdown(f"- 🔗 [View Job]({job.get('link')})")
-                st.markdown("---")
-        else:
-            st.warning("No LinkedIn jobs found.")
-
-        st.markdown("---")
-        st.header("💼 Top Naukri Jobs (India)")
-
-        if naukri_jobs:
-            for job in naukri_jobs:
-                st.markdown(f"**{job.get('title')}** at *{job.get('companyName')}*")
-                st.markdown(f"- 📍 {job.get('location')}")
+        if rss_jobs:
+            for job in rss_jobs:
+                st.markdown(f"**{job.get('title')}** at *{job.get('companyName')}* ({job.get('source')})")
+                if job.get('location'):
+                    st.markdown(f"- 📍 {job.get('location')}")
                 st.markdown(f"- 🔗 [View Job]({job.get('url')})")
                 st.markdown("---")
         else:
-            st.warning("No Naukri jobs found.")
+            st.warning("No jobs found in RSS feeds.")
 
 

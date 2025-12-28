@@ -10,17 +10,18 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [keywords, setKeywords] = useState('')
   const [loadingJobs, setLoadingJobs] = useState(false)
-  const [linkedinJobs, setLinkedinJobs] = useState<Job[]>([])
-  const [naukriJobs, setNaukriJobs] = useState<Job[]>([])
+  const [jobs, setJobs] = useState<Job[]>([])
 
   const onUpload = async (file: File) => {
     setLoading(true)
     try {
       const result = await api.analyzeResume(file)
+      console.log('Analysis result:', result)
       setAnalysis(result)
     } catch (e) {
-      console.error(e)
-      alert('Failed to analyze resume')
+      console.error('Analysis error:', e)
+      const errMsg = e instanceof Error ? e.message : String(e)
+      alert(`Failed to analyze resume: ${errMsg}`)
     } finally {
       setLoading(false)
     }
@@ -33,9 +34,8 @@ export default function App() {
       const kw = await api.getKeywords(analysis.summary)
       const cleaned = kw.replace(/\n/g, '').trim()
       setKeywords(cleaned)
-      const { linkedinJobs, naukriJobs } = await api.getJobs(cleaned)
-      setLinkedinJobs(linkedinJobs)
-      setNaukriJobs(naukriJobs)
+      const { jobs } = await api.getJobs(cleaned)
+      setJobs(jobs)
     } catch (e) {
       console.error(e)
       alert('Failed to fetch jobs')
@@ -47,9 +47,13 @@ export default function App() {
   return (
     <div className="container">
       <div className="header">
-        <h1>📄 AI Job Recommender</h1>
+        <div>
+          <p className="eyebrow">AI + RSS MATCHER</p>
+          <h1>📄 Smart Job Recommender</h1>
+          <p className="helper">Upload your resume, extract the strongest keywords, and browse a clean feed of curated roles aggregated from RSS-powered job sources.</p>
+        </div>
+        <div className="badge">Live</div>
       </div>
-      <p className="helper">Upload your resume and get job recommendations based on your skills and experience from LinkedIn and Naukri.</p>
 
       <UploadResume onUpload={onUpload} loading={loading} />
       <div style={{ height: 12 }} />
@@ -66,8 +70,7 @@ export default function App() {
       </div>
 
       <div className="row" style={{ marginTop: 16 }}>
-        <JobList title="💼 Top LinkedIn Jobs" jobs={linkedinJobs} />
-        <JobList title="💼 Top Naukri Jobs (India)" jobs={naukriJobs} />
+        <JobList title="💼 Fresh Roles from RSS Feeds" jobs={jobs} />
       </div>
     </div>
   )

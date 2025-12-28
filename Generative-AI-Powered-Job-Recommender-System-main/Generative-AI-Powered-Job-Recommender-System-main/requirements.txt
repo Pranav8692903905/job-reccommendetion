@@ -1,8 +1,8 @@
 streamlit
-openai 
 pymupdf 
 python-dotenv
-apify-client
+feedparser
+requests
 fastapi
 uvicorn[standard]
 python-multipart

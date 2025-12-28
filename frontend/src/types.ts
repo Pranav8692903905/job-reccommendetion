@@ -8,6 +8,6 @@ export type Job = {
   title: string
   companyName: string
   location?: string
-  link?: string // LinkedIn
-  url?: string // Naukri
+  url?: string // Primary job link
+  source?: string // e.g., RSS feed name
 }

@@ -16,11 +16,9 @@ export default function JobList({ title, jobs }: Props) {
           <div className="job" key={idx}>
             <h4>{job.title} <span className="helper">@ {job.companyName}</span></h4>
             {job.location && <div className="helper">📍 {job.location}</div>}
-            {job.link && (
-              <div><a href={job.link} target="_blank" rel="noreferrer">View Job</a></div>
-            )}
+            {job.source && <div className="pill">{job.source}</div>}
             {job.url && (
-              <div><a href={job.url} target="_blank" rel="noreferrer">View Job</a></div>
+              <div><a href={job.url} target="_blank" rel="noreferrer">View Role</a></div>
             )}
           </div>
         ))}

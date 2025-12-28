@@ -1,11 +1,11 @@
 # Job Recommender API (FastAPI)
 
-A lightweight API wrapper over existing functions (`extract_text_from_pdf`, `ask_openai`, `fetch_linkedin_jobs`, `fetch_naukri_jobs`). Streamlit remains unchanged.
+API wrapper over local analysis utilities (`extract_text_from_pdf`, `analyze_resume`, `extract_keywords`) and RSS-based job fetching.
 
 ## Endpoints
 - `POST /api/analyze/resume` (multipart, field `file`): returns `{ summary, gaps, roadmap }`
 - `POST /api/keywords` with JSON `{ summary }`: returns `{ keywords }`
-- `GET /api/jobs?keywords=...&rows=60`: returns `{ linkedinJobs: Job[], naukriJobs: Job[] }`
+- `GET /api/jobs?keywords=...&rows=60`: returns `{ jobs: Job[] }`
 - `GET /api/health`: health check
 
 ## Run locally
@@ -17,4 +17,4 @@ python -m pip install -r requirements.txt
 uvicorn api_server:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Set environment variables (e.g. `OPENAI_API_KEY`, `APIFY_API_TOKEN`) via `.env` in this folder.
+Optional: set `OPENROUTER_API_KEY` (and `OPENROUTER_MODEL`) for LLM-powered analysis. Without it, heuristic analysis runs. No external job APIs required (RSS feeds only).
